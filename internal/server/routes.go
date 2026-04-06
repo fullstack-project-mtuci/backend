@@ -19,6 +19,7 @@ func RegisterRoutes(
 	advanceHandler *handlers.AdvanceHandler,
 	expenseHandler *handlers.ExpenseReportHandler,
 	receiptHandler *handlers.ReceiptHandler,
+	referenceHandler *handlers.ReferenceHandler,
 	auditHandler *handlers.AuditHandler,
 	authMiddleware *middleware.AuthMiddleware,
 ) {
@@ -59,6 +60,11 @@ func RegisterRoutes(
 	receipts := v1.Group("/receipts", authMiddleware.Handle)
 	receipts.Get("/", receiptHandler.List)
 	receipts.Post("/", receiptHandler.Upload)
+
+	references := v1.Group("/references", authMiddleware.Handle)
+	references.Get("/departments", referenceHandler.ListDepartments)
+	references.Get("/projects", referenceHandler.ListProjects)
+	references.Get("/categories", referenceHandler.ListCategories)
 
 	admin := v1.Group("/admin", authMiddleware.Handle, middleware.RequireRoles(models.RoleAdmin))
 	admin.Get("/users", adminHandler.ListUsers)

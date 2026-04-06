@@ -157,25 +157,21 @@ func (h *ReceiptHandler) runOCR(ctx context.Context, file *models.ReceiptFile, d
 		ProcessedAt:     ptrTime(time.Now()),
 	}
 
-	if result.Date != "" {
-		if parsed, err := time.Parse("2006-01-02", result.Date); err == nil {
-			rec.ExtractedDate = &parsed
-		}
+	normalizedDate, parsedDate := normalizePurchaseDate(result.Draft.PurchaseDate)
+	if parsedDate != nil {
+		rec.ExtractedDate = parsedDate
 	}
-	if result.Amount != 0 {
-		rec.ExtractedAmount = &result.Amount
+	if result.Draft.TotalAmount != 0 {
+		rec.ExtractedAmount = &result.Draft.TotalAmount
 	}
-	if result.Currency != "" {
-		rec.ExtractedCurrency = result.Currency
+	if result.Draft.Currency != "" {
+		rec.ExtractedCurrency = result.Draft.Currency
 	}
-	if result.Vendor != "" {
-		rec.ExtractedVendor = result.Vendor
+	if result.Draft.VendorName != "" {
+		rec.ExtractedVendor = result.Draft.VendorName
 	}
-	if result.TaxAmount != 0 {
-		rec.ExtractedTax = &result.TaxAmount
-	}
-	if result.Confidence != 0 {
-		rec.ConfidenceScore = &result.Confidence
+	if result.Draft.TaxAmount != 0 {
+		rec.ExtractedTax = &result.Draft.TaxAmount
 	}
 
 	if err := h.receipts.CreateRecognition(ctx, rec); err != nil {
@@ -183,12 +179,11 @@ func (h *ReceiptHandler) runOCR(ctx context.Context, file *models.ReceiptFile, d
 	}
 
 	return &dto.OCRDraftResponse{
-		ExpenseDate: result.Date,
-		Amount:      result.Amount,
-		Currency:    result.Currency,
-		Vendor:      result.Vendor,
-		Tax:         result.TaxAmount,
-		Confidence:  result.Confidence,
+		ExpenseDate: normalizedDate,
+		Amount:      result.Draft.TotalAmount,
+		Currency:    result.Draft.Currency,
+		Vendor:      result.Draft.VendorName,
+		Tax:         result.Draft.TaxAmount,
 		Raw:         jsonRawToInterface(result.RawJSON),
 	}
 }
@@ -215,7 +210,7 @@ func readFileData(header *multipart.FileHeader) ([]byte, string, error) {
 
 func isAllowedMime(mime string) bool {
 	switch strings.ToLower(mime) {
-	case "image/jpeg", "image/png", "application/pdf":
+	case "image/jpeg", "image/png", "image/jpg":
 		return true
 	default:
 		return false
@@ -235,4 +230,29 @@ func jsonRawToInterface(raw []byte) interface{} {
 		return nil
 	}
 	return v
+}
+
+func normalizePurchaseDate(value string) (string, *time.Time) {
+	if value == "" {
+		return "", nil
+	}
+	layouts := []string{
+		"2006-01-02",
+		time.RFC3339,
+		"02/01/2006",
+		"01/02/2006",
+		"02.01.2006",
+		"01.02.2006",
+		"2006/01/02",
+		"02-01-2006",
+		"01-02-2006",
+	}
+	for _, layout := range layouts {
+		if parsed, err := time.Parse(layout, value); err == nil {
+			date := parsed.Format("2006-01-02")
+			parsedDate := parsed
+			return date, &parsedDate
+		}
+	}
+	return "", nil
 }

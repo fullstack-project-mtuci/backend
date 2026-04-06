@@ -180,11 +180,14 @@ func (h *AuthHandler) respondWithTokens(c *fiber.Ctx, user *models.User) error {
 
 func sanitizeUser(user *models.User) fiber.Map {
 	return fiber.Map{
-		"id":         user.ID,
-		"email":      user.Email,
-		"full_name":  user.FullName,
-		"role":       user.Role,
-		"created_at": user.CreatedAt,
-		"updated_at": user.UpdatedAt,
+		"id":            user.ID,
+		"email":         user.Email,
+		"full_name":     user.FullName,
+		"role":          user.Role,
+		"department_id": user.DepartmentID,
+		"manager_id":    user.ManagerID,
+		"is_active":     user.IsActive,
+		"created_at":    user.CreatedAt,
+		"updated_at":    user.UpdatedAt,
 	}
 }

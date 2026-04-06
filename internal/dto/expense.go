@@ -35,11 +35,11 @@ type ExpenseItemPayload struct {
 
 // OCRDraftResponse describes OCR response.
 type OCRDraftResponse struct {
-	ExpenseDate string  `json:"expense_date"`
-	Amount      float64 `json:"amount"`
-	Currency    string  `json:"currency"`
-	Vendor      string  `json:"vendor"`
-	Tax         float64 `json:"tax"`
-	Confidence  float64 `json:"confidence"`
-	Raw         any     `json:"raw"`
+	ExpenseDate string  `json:"expense_date,omitempty"`
+	Amount      float64 `json:"amount,omitempty"`
+	Currency    string  `json:"currency,omitempty"`
+	Vendor      string  `json:"vendor,omitempty"`
+	Tax         float64 `json:"tax,omitempty"`
+	Confidence  float64 `json:"confidence,omitempty"`
+	Raw         any     `json:"raw,omitempty"`
 }

@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -75,6 +76,8 @@ WHERE scope_type = $1 AND scope_id = $2 AND period_start <= $3 AND period_end >=
 ORDER BY period_end DESC
 LIMIT 1`
 	var budget models.Budget
+
+	fmt.Println(scopeType, scopeID, date)
 	if err := scanBudget(r.pool.QueryRow(ctx, query, scopeType, scopeID, date), &budget); err != nil {
 		return nil, err
 	}

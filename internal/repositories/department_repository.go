@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
@@ -139,4 +140,41 @@ func (r *DepartmentRepository) DeleteProject(ctx context.Context, id uuid.UUID) 
 
 func scanProject(row pgx.Row, p *models.Project) error {
 	return row.Scan(&p.ID, &p.DepartmentID, &p.Name, &p.Code, &p.IsActive, &p.CreatedAt, &p.UpdatedAt)
+}
+
+// ListProjectsForDepartmentWithBudget returns active projects for department with available budgets.
+func (r *DepartmentRepository) ListProjectsForDepartmentWithBudget(ctx context.Context, departmentID uuid.UUID, at time.Time) ([]models.Project, error) {
+	const query = `
+SELECT DISTINCT p.id, p.department_id, p.name, p.code, p.is_active, p.created_at, p.updated_at
+FROM projects p
+LEFT JOIN budgets pb
+	ON pb.scope_type = 'project'
+	AND pb.scope_id = p.id
+	AND pb.period_start <= $2
+	AND pb.period_end >= $2
+LEFT JOIN budgets db
+	ON db.scope_type = 'department'
+	AND db.scope_id = p.department_id
+	AND db.period_start <= $2
+	AND db.period_end >= $2
+WHERE p.department_id = $1
+	AND p.is_active = TRUE
+	AND (pb.id IS NOT NULL OR db.id IS NOT NULL)
+ORDER BY p.name`
+
+	rows, err := r.pool.Query(ctx, query, departmentID, at)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var projects []models.Project
+	for rows.Next() {
+		var p models.Project
+		if err := scanProject(rows, &p); err != nil {
+			return nil, err
+		}
+		projects = append(projects, p)
+	}
+	return projects, rows.Err()
 }

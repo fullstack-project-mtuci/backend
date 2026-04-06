@@ -8,8 +8,10 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
+	"net/textproto"
 	"path"
 	"strings"
+	"time"
 
 	"backend/internal/config"
 )
@@ -23,13 +25,26 @@ type RecognizeRequest struct {
 
 // RecognizeResult contains parsed fields from OCR provider.
 type RecognizeResult struct {
-	Date       string  `json:"date"`
-	Amount     float64 `json:"amount"`
-	Currency   string  `json:"currency"`
-	Vendor     string  `json:"vendor"`
-	TaxAmount  float64 `json:"tax_amount"`
-	Confidence float64 `json:"confidence"`
-	RawJSON    json.RawMessage
+	ReceiptID string `json:"receipt_id"`
+	Draft     struct {
+		VendorName   string          `json:"vendor_name"`
+		PurchaseDate string          `json:"purchase_date"`
+		TotalAmount  float64         `json:"total_amount"`
+		Currency     string          `json:"currency"`
+		TaxAmount    float64         `json:"tax_amount"`
+		ModelName    string          `json:"model_name"`
+		Status       string          `json:"status"`
+		RawText      string          `json:"raw_text_like_output"`
+		Source       string          `json:"source"`
+		Items        json.RawMessage `json:"items"`
+	} `json:"draft"`
+	RawPrediction    json.RawMessage        `json:"raw_prediction"`
+	ModelName        string                 `json:"model_name"`
+	Status           string                 `json:"status"`
+	ProcessedAt      time.Time              `json:"processed_at"`
+	ProcessingTimeMs int                    `json:"processing_time_ms"`
+	Metadata         map[string]interface{} `json:"metadata"`
+	RawJSON          json.RawMessage
 }
 
 // Adapter performs OCR recognition.
@@ -45,7 +60,7 @@ type httpAdapter struct {
 // NewHTTPAdapter builds HTTP-based OCR adapter.
 func NewHTTPAdapter(cfg config.OCRConfig) Adapter {
 	return &httpAdapter{
-		client: &http.Client{Timeout: cfg.Timeout},
+		client: &http.Client{Timeout: time.Minute * 2},
 		cfg:    cfg,
 	}
 }
@@ -53,14 +68,21 @@ func NewHTTPAdapter(cfg config.OCRConfig) Adapter {
 func (a *httpAdapter) Recognize(ctx context.Context, req RecognizeRequest) (*RecognizeResult, error) {
 	var body bytes.Buffer
 	writer := multipart.NewWriter(&body)
-	part, err := writer.CreateFormFile("file", fileNameOrDefault(req.Filename))
+	partHeaders := textproto.MIMEHeader{}
+	partHeaders.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"; filename="%s"`, "file", fileNameOrDefault(req.Filename)))
+	contentType := req.ContentType
+	if contentType == "" {
+		contentType = "application/octet-stream"
+	}
+	partHeaders.Set("Content-Type", contentType)
+
+	part, err := writer.CreatePart(partHeaders)
 	if err != nil {
 		return nil, fmt.Errorf("create form file: %w", err)
 	}
 	if _, err := part.Write(req.Data); err != nil {
 		return nil, fmt.Errorf("write file data: %w", err)
 	}
-	_ = writer.WriteField("content_type", req.ContentType)
 	if err := writer.Close(); err != nil {
 		return nil, fmt.Errorf("close writer: %w", err)
 	}
@@ -96,6 +118,7 @@ func (a *httpAdapter) Recognize(ctx context.Context, req RecognizeRequest) (*Rec
 		return nil, fmt.Errorf("parse response: %w", err)
 	}
 	parsed.RawJSON = json.RawMessage(respBody)
+	fmt.Println(string(respBody))
 
 	return &parsed, nil
 }

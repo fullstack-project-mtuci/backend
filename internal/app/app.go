@@ -46,6 +46,7 @@ func Start(ctx context.Context) error {
 			handlers.NewAdvanceHandler,
 			handlers.NewExpenseReportHandler,
 			handlers.NewReceiptHandler,
+			handlers.NewReferenceHandler,
 			handlers.NewAuditHandler,
 			services.NewWorkflowLogger,
 		),

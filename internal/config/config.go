@@ -20,6 +20,7 @@ type Config struct {
 	BudgetLimitMode    string
 	Storage            StorageConfig
 	OCR                OCRConfig
+	CORS               CORSConfig
 	MaxUploadSizeBytes int64
 }
 
@@ -40,6 +41,12 @@ type OCRConfig struct {
 	Timeout time.Duration
 }
 
+// CORSConfig describes HTTP cross-origin headers.
+type CORSConfig struct {
+	AllowedOrigins   []string
+	AllowCredentials bool
+}
+
 // Load reads configuration from environment variables (with optional .env file).
 func Load() (*Config, error) {
 	_ = godotenv.Load()
@@ -51,6 +58,8 @@ func Load() (*Config, error) {
 		BudgetLimitMode:    strings.ToLower(getEnv("BUDGET_LIMIT_MODE", "soft")),
 		MaxUploadSizeBytes: parseInt64Env("MAX_UPLOAD_SIZE_BYTES", 10*1024*1024),
 	}
+
+	fmt.Println(cfg)
 
 	if cfg.DatabaseURL == "" {
 		return nil, fmt.Errorf("DATABASE_URL is required")
@@ -74,6 +83,10 @@ func Load() (*Config, error) {
 	}
 
 	if cfg.OCR, err = loadOCRConfig(); err != nil {
+		return nil, err
+	}
+
+	if cfg.CORS, err = loadCORSConfig(); err != nil {
 		return nil, err
 	}
 
@@ -125,6 +138,32 @@ func loadOCRConfig() (OCRConfig, error) {
 	return cfg, nil
 }
 
+func loadCORSConfig() (CORSConfig, error) {
+	allowCredentials, err := parseBoolEnv("CORS_ALLOW_CREDENTIALS", false)
+	if err != nil {
+		return CORSConfig{}, err
+	}
+
+	rawOrigins := getEnv("CORS_ALLOWED_ORIGINS", "*")
+	origins := splitAndTrim(rawOrigins)
+	if len(origins) == 0 {
+		return CORSConfig{}, fmt.Errorf("CORS_ALLOWED_ORIGINS must contain at least one origin")
+	}
+
+	if allowCredentials {
+		for _, origin := range origins {
+			if origin == "*" {
+				return CORSConfig{}, fmt.Errorf("CORS_ALLOW_CREDENTIALS cannot be true when CORS_ALLOWED_ORIGINS allows '*'")
+			}
+		}
+	}
+
+	return CORSConfig{
+		AllowedOrigins:   origins,
+		AllowCredentials: allowCredentials,
+	}, nil
+}
+
 func parseDuration(key string, fallback time.Duration) (time.Duration, error) {
 	val := os.Getenv(key)
 	if val == "" {
@@ -172,4 +211,16 @@ func parseInt64Env(key string, fallback int64) int64 {
 		return fallback
 	}
 	return parsed
+}
+
+func splitAndTrim(value string) []string {
+	parts := strings.Split(value, ",")
+	res := make([]string, 0, len(parts))
+	for _, part := range parts {
+		part = strings.TrimSpace(part)
+		if part != "" {
+			res = append(res, part)
+		}
+	}
+	return res
 }

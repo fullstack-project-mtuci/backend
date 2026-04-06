@@ -310,6 +310,9 @@ func (h *TripHandler) buildTripFromPayload(employeeID uuid.UUID, payload dto.Tri
 	if err != nil {
 		return nil, fiber.NewError(fiber.StatusBadRequest, "invalid project_id")
 	}
+	if projectID == nil {
+		return nil, fiber.NewError(fiber.StatusBadRequest, "project_id is required")
+	}
 
 	trip := &models.TripRequest{
 		EmployeeID:            employeeID,

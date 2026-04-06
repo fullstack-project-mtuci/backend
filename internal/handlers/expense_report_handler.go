@@ -69,7 +69,7 @@ func (h *ExpenseReportHandler) Create(c *fiber.Ctx) error {
 	}
 
 	advanceAmount := 0.0
-	if adv, err := h.advances.FindByTrip(ctx, trip.ID); err == nil && adv.Status == models.AdvanceStatusApproved || adv.Status == models.AdvanceStatusPaid {
+	if adv, err := h.advances.FindByTrip(ctx, trip.ID); err == nil && (adv.Status == models.AdvanceStatusApproved || adv.Status == models.AdvanceStatusPaid) {
 		advanceAmount = adv.ApprovedAmount
 	}
 
@@ -131,7 +131,6 @@ func (h *ExpenseReportHandler) Get(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	before := *report
 	if user.Role == models.RoleEmployee && report.EmployeeID != user.ID {
 		return fiber.ErrForbidden
 	}
@@ -299,6 +298,7 @@ func (h *ExpenseReportHandler) UpdateStatus(c *fiber.Ctx) error {
 	case models.ExpenseReportRejected, models.ExpenseReportNeedsRevision:
 		// allow edits again
 	}
+	before := *report
 
 	report.Status = next
 	ctx := requestContext(c)

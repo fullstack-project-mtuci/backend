@@ -29,7 +29,14 @@ func NewAdvanceHandler(trips *repositories.TripRepository, advances *repositorie
 	return &AdvanceHandler{trips: trips, advances: advances, logger: logger}
 }
 
-// Get returns advance request for trip.
+// Get godoc
+// @Summary Get advance for trip
+// @Tags Advances
+// @Produce json
+// @Security BearerAuth
+// @Param tripId path string true "Trip ID"
+// @Success 200 {object} map[string]interface{}
+// @Router /trip-requests/{tripId}/advance [get]
 func (h *AdvanceHandler) Get(c *fiber.Ctx) error {
 	user := middleware.GetUser(c)
 	if user == nil {
@@ -54,7 +61,16 @@ func (h *AdvanceHandler) Get(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"advance": adv})
 }
 
-// Create creates or updates draft advance request.
+// Create godoc
+// @Summary Create or update draft advance
+// @Tags Advances
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param tripId path string true "Trip ID"
+// @Param payload body dto.AdvancePayload true "Advance payload"
+// @Success 201 {object} map[string]interface{}
+// @Router /trip-requests/{tripId}/advance [post]
 func (h *AdvanceHandler) Create(c *fiber.Ctx) error {
 	user := middleware.GetUser(c)
 	if user == nil {
@@ -125,7 +141,16 @@ func (h *AdvanceHandler) Create(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"advance": advance})
 }
 
-// UpdateStatus handles workflow transitions.
+// UpdateStatus godoc
+// @Summary Change advance status
+// @Tags Advances
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param tripId path string true "Trip ID"
+// @Param payload body dto.StatusPayload true "Status payload"
+// @Success 200 {object} map[string]interface{}
+// @Router /trip-requests/{tripId}/advance/status [patch]
 func (h *AdvanceHandler) UpdateStatus(c *fiber.Ctx) error {
 	user := middleware.GetUser(c)
 	if user == nil {

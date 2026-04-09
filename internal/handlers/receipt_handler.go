@@ -43,7 +43,16 @@ func NewReceiptHandler(storage *storage.Client, receipts *repositories.ReceiptRe
 	}
 }
 
-// Upload handles receipt upload with OCR.
+// Upload godoc
+// @Summary Upload receipt
+// @Tags Receipts
+// @Accept multipart/form-data
+// @Produce json
+// @Security BearerAuth
+// @Param file formData file true "Receipt image or PDF"
+// @Success 201 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Router /receipts [post]
 func (h *ReceiptHandler) Upload(c *fiber.Ctx) error {
 	user := middleware.GetUser(c)
 	if user == nil {
@@ -96,7 +105,14 @@ func (h *ReceiptHandler) Upload(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(resp)
 }
 
-// List returns recent receipts for the user.
+// List godoc
+// @Summary List uploaded receipts
+// @Tags Receipts
+// @Produce json
+// @Security BearerAuth
+// @Param limit query int false "Max items"
+// @Success 200 {object} map[string]interface{}
+// @Router /receipts [get]
 func (h *ReceiptHandler) List(c *fiber.Ctx) error {
 	user := middleware.GetUser(c)
 	if user == nil {

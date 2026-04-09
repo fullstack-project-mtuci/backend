@@ -1,4 +1,1206 @@
+basePath: /api/v1
+definitions:
+  dto.AdvancePayload:
+    properties:
+      approved_amount:
+        type: number
+      comment:
+        type: string
+      currency:
+        type: string
+      requested_amount:
+        type: number
+    type: object
+  dto.BudgetPayload:
+    properties:
+      currency:
+        type: string
+      period_end:
+        type: string
+      period_start:
+        type: string
+      scope_id:
+        type: string
+      scope_type:
+        type: string
+      total_limit:
+        type: number
+    type: object
+  dto.DepartmentPayload:
+    properties:
+      code:
+        type: string
+      name:
+        type: string
+    type: object
+  dto.ExpenseCategoryPayload:
+    properties:
+      code:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+    type: object
+  dto.ExpenseItemPayload:
+    properties:
+      amount:
+        type: number
+      category:
+        type: string
+      currency:
+        type: string
+      description:
+        type: string
+      expense_date:
+        type: string
+      receipt_file_id:
+        type: string
+      source:
+        type: string
+      status:
+        type: string
+      tax_amount:
+        type: number
+      vendor_name:
+        type: string
+    type: object
+  dto.ExpenseReportStatusPayload:
+    properties:
+      comment:
+        type: string
+      status:
+        type: string
+    type: object
+  dto.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  dto.ProjectPayload:
+    properties:
+      code:
+        type: string
+      department_id:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+    type: object
+  dto.RefreshTokenRequest:
+    properties:
+      refreshToken:
+        type: string
+    type: object
+  dto.RegisterRequest:
+    properties:
+      email:
+        type: string
+      full_name:
+        type: string
+      password:
+        type: string
+    type: object
+  dto.StatusPayload:
+    properties:
+      comment:
+        type: string
+      status:
+        type: string
+    type: object
+  dto.TripPayload:
+    properties:
+      comment:
+        type: string
+      currency:
+        type: string
+      destination_city:
+        type: string
+      destination_country:
+        type: string
+      end_date:
+        type: string
+      planned_daily_allowance:
+        type: number
+      planned_hotel:
+        type: number
+      planned_other:
+        type: number
+      planned_transport:
+        type: number
+      project_id:
+        type: string
+      purpose:
+        type: string
+      start_date:
+        type: string
+      status:
+        type: string
+    type: object
+  dto.UserPayload:
+    properties:
+      department_id:
+        type: string
+      email:
+        type: string
+      full_name:
+        type: string
+      is_active:
+        type: boolean
+      manager_id:
+        type: string
+      password:
+        type: string
+      role:
+        type: string
+    type: object
 info:
   contact: {}
-paths: {}
+  description: REST API for the Business Trip and Expense Portal
+  title: Travel Portal API
+  version: "1.0"
+paths:
+  /admin/budgets:
+    get:
+      parameters:
+      - description: department|project
+        in: query
+        name: scope_type
+        type: string
+      - description: Scope ID
+        in: query
+        name: scope_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List budgets
+      tags:
+      - Admin
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Budget payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.BudgetPayload'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create budget
+      tags:
+      - Admin
+  /admin/categories:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List categories
+      tags:
+      - Admin
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Category payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ExpenseCategoryPayload'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create category
+      tags:
+      - Admin
+  /admin/categories/{id}:
+    delete:
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+      security:
+      - BearerAuth: []
+      summary: Delete category
+      tags:
+      - Admin
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Category payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ExpenseCategoryPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update category
+      tags:
+      - Admin
+  /admin/departments:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List departments
+      tags:
+      - Admin
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Department payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.DepartmentPayload'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create department
+      tags:
+      - Admin
+  /admin/departments/{id}:
+    delete:
+      parameters:
+      - description: Department ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+      security:
+      - BearerAuth: []
+      summary: Delete department
+      tags:
+      - Admin
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Department ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Department payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.DepartmentPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update department
+      tags:
+      - Admin
+  /admin/projects:
+    get:
+      parameters:
+      - description: Filter by department
+        in: query
+        name: department_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List projects
+      tags:
+      - Admin
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Project payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ProjectPayload'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create project
+      tags:
+      - Admin
+  /admin/projects/{id}:
+    delete:
+      parameters:
+      - description: Project ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+      security:
+      - BearerAuth: []
+      summary: Delete project
+      tags:
+      - Admin
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Project ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Project payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ProjectPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update project
+      tags:
+      - Admin
+  /admin/users:
+    get:
+      parameters:
+      - description: Filter by role
+        in: query
+        name: role
+        type: string
+      - description: Filter by department
+        in: query
+        name: department_id
+        type: string
+      - description: Include inactive users
+        in: query
+        name: include_inactive
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List users
+      tags:
+      - Admin
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: User payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserPayload'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create user
+      tags:
+      - Admin
+  /admin/users/{id}:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: User payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update user
+      tags:
+      - Admin
+  /audit/{entityType}/{entityId}/approvals:
+    get:
+      parameters:
+      - description: Entity type
+        enum:
+        - trip_request
+        - advance_request
+        - expense_report
+        in: path
+        name: entityType
+        required: true
+        type: string
+      - description: Entity ID
+        in: path
+        name: entityId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List approval actions
+      tags:
+      - Audit
+  /audit/{entityType}/{entityId}/logs:
+    get:
+      parameters:
+      - description: Entity type
+        enum:
+        - trip_request
+        - advance_request
+        - expense_report
+        in: path
+        name: entityType
+        required: true
+        type: string
+      - description: Entity ID
+        in: path
+        name: entityId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List audit log entries
+      tags:
+      - Audit
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Login payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Login via email and password
+      tags:
+      - Auth
+  /auth/me:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get current user
+      tags:
+      - Auth
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Refresh token payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RefreshTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Refresh access token
+      tags:
+      - Auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Creates an employee profile and issues default role.
+      parameters:
+      - description: Registration payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Register new employee
+      tags:
+      - Auth
+  /expense-reports/{reportId}:
+    get:
+      parameters:
+      - description: Report ID
+        in: path
+        name: reportId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get expense report by ID
+      tags:
+      - ExpenseReports
+  /expense-reports/{reportId}/items:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Report ID
+        in: path
+        name: reportId
+        required: true
+        type: string
+      - description: Expense item payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ExpenseItemPayload'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Add expense item
+      tags:
+      - ExpenseReports
+  /expense-reports/{reportId}/items/{itemId}:
+    delete:
+      parameters:
+      - description: Report ID
+        in: path
+        name: reportId
+        required: true
+        type: string
+      - description: Item ID
+        in: path
+        name: itemId
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+      security:
+      - BearerAuth: []
+      summary: Delete expense item
+      tags:
+      - ExpenseReports
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Report ID
+        in: path
+        name: reportId
+        required: true
+        type: string
+      - description: Item ID
+        in: path
+        name: itemId
+        required: true
+        type: string
+      - description: Expense item payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ExpenseItemPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update expense item
+      tags:
+      - ExpenseReports
+  /expense-reports/{reportId}/status:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Report ID
+        in: path
+        name: reportId
+        required: true
+        type: string
+      - description: Status payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ExpenseReportStatusPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Change expense report status
+      tags:
+      - ExpenseReports
+  /receipts:
+    get:
+      parameters:
+      - description: Max items
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List uploaded receipts
+      tags:
+      - Receipts
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: Receipt image or PDF
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Upload receipt
+      tags:
+      - Receipts
+  /references/categories:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List expense categories
+      tags:
+      - References
+  /references/departments:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List departments
+      tags:
+      - References
+  /references/projects:
+    get:
+      parameters:
+      - description: Department ID
+        in: query
+        name: department_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List projects
+      tags:
+      - References
+  /trip-requests:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List trip requests
+      tags:
+      - Trips
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Trip data
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.TripPayload'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create trip request
+      tags:
+      - Trips
+  /trip-requests/{id}:
+    delete:
+      parameters:
+      - description: Trip ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+      security:
+      - BearerAuth: []
+      summary: Delete trip
+      tags:
+      - Trips
+    get:
+      parameters:
+      - description: Trip ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get trip by ID
+      tags:
+      - Trips
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Trip ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Trip data
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.TripPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update trip
+      tags:
+      - Trips
+  /trip-requests/{id}/status:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Trip ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Status payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.StatusPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Change trip status
+      tags:
+      - Trips
+  /trip-requests/{tripId}/advance:
+    get:
+      parameters:
+      - description: Trip ID
+        in: path
+        name: tripId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get advance for trip
+      tags:
+      - Advances
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Trip ID
+        in: path
+        name: tripId
+        required: true
+        type: string
+      - description: Advance payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AdvancePayload'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create or update draft advance
+      tags:
+      - Advances
+  /trip-requests/{tripId}/advance/status:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Trip ID
+        in: path
+        name: tripId
+        required: true
+        type: string
+      - description: Status payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.StatusPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Change advance status
+      tags:
+      - Advances
+  /trip-requests/{tripId}/expense-report:
+    get:
+      parameters:
+      - description: Trip ID
+        in: path
+        name: tripId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get expense report for trip
+      tags:
+      - ExpenseReports
+    post:
+      parameters:
+      - description: Trip ID
+        in: path
+        name: tripId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create expense report
+      tags:
+      - ExpenseReports
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

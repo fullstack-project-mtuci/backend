@@ -36,7 +36,16 @@ func NewAdminHandler(
 	}
 }
 
-// ListUsers returns users with optional filters.
+// ListUsers godoc
+// @Summary List users
+// @Tags Admin
+// @Produce json
+// @Security BearerAuth
+// @Param role query string false "Filter by role"
+// @Param department_id query string false "Filter by department"
+// @Param include_inactive query bool false "Include inactive users"
+// @Success 200 {object} map[string]interface{}
+// @Router /admin/users [get]
 func (h *AdminHandler) ListUsers(c *fiber.Ctx) error {
 	var params repositories.UserListParams
 	role := strings.TrimSpace(c.Query("role"))
@@ -71,7 +80,15 @@ func (h *AdminHandler) ListUsers(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"items": items})
 }
 
-// CreateUser creates a new user with specific role.
+// CreateUser godoc
+// @Summary Create user
+// @Tags Admin
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param payload body dto.UserPayload true "User payload"
+// @Success 201 {object} map[string]interface{}
+// @Router /admin/users [post]
 func (h *AdminHandler) CreateUser(c *fiber.Ctx) error {
 	var payload dto.UserPayload
 	if err := c.BodyParser(&payload); err != nil {
@@ -101,7 +118,16 @@ func (h *AdminHandler) CreateUser(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"user": adminUserView(user)})
 }
 
-// UpdateUser updates an existing user.
+// UpdateUser godoc
+// @Summary Update user
+// @Tags Admin
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "User ID"
+// @Param payload body dto.UserPayload true "User payload"
+// @Success 200 {object} map[string]interface{}
+// @Router /admin/users/{id} [put]
 func (h *AdminHandler) UpdateUser(c *fiber.Ctx) error {
 	id, err := uuid.Parse(c.Params("id"))
 	if err != nil {
@@ -152,7 +178,13 @@ func (h *AdminHandler) UpdateUser(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"user": adminUserView(user)})
 }
 
-// ListDepartments returns departments.
+// ListDepartments godoc
+// @Summary List departments
+// @Tags Admin
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} map[string]interface{}
+// @Router /admin/departments [get]
 func (h *AdminHandler) ListDepartments(c *fiber.Ctx) error {
 	ctx := requestContext(c)
 	deps, err := h.departments.ListDepartments(ctx)
@@ -162,7 +194,15 @@ func (h *AdminHandler) ListDepartments(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"items": deps})
 }
 
-// CreateDepartment creates department.
+// CreateDepartment godoc
+// @Summary Create department
+// @Tags Admin
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param payload body dto.DepartmentPayload true "Department payload"
+// @Success 201 {object} map[string]interface{}
+// @Router /admin/departments [post]
 func (h *AdminHandler) CreateDepartment(c *fiber.Ctx) error {
 	var payload dto.DepartmentPayload
 	if err := c.BodyParser(&payload); err != nil {
@@ -179,7 +219,16 @@ func (h *AdminHandler) CreateDepartment(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"department": dept})
 }
 
-// UpdateDepartment updates department.
+// UpdateDepartment godoc
+// @Summary Update department
+// @Tags Admin
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "Department ID"
+// @Param payload body dto.DepartmentPayload true "Department payload"
+// @Success 200 {object} map[string]interface{}
+// @Router /admin/departments/{id} [put]
 func (h *AdminHandler) UpdateDepartment(c *fiber.Ctx) error {
 	deptID, err := uuid.Parse(c.Params("id"))
 	if err != nil {
@@ -203,7 +252,13 @@ func (h *AdminHandler) UpdateDepartment(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"department": dept})
 }
 
-// DeleteDepartment deletes department.
+// DeleteDepartment godoc
+// @Summary Delete department
+// @Tags Admin
+// @Security BearerAuth
+// @Param id path string true "Department ID"
+// @Success 204
+// @Router /admin/departments/{id} [delete]
 func (h *AdminHandler) DeleteDepartment(c *fiber.Ctx) error {
 	deptID, err := uuid.Parse(c.Params("id"))
 	if err != nil {
@@ -217,7 +272,14 @@ func (h *AdminHandler) DeleteDepartment(c *fiber.Ctx) error {
 	return c.SendStatus(fiber.StatusNoContent)
 }
 
-// ListProjects returns projects.
+// ListProjects godoc
+// @Summary List projects
+// @Tags Admin
+// @Produce json
+// @Security BearerAuth
+// @Param department_id query string false "Filter by department"
+// @Success 200 {object} map[string]interface{}
+// @Router /admin/projects [get]
 func (h *AdminHandler) ListProjects(c *fiber.Ctx) error {
 	var deptID *uuid.UUID
 	if raw := c.Query("department_id"); raw != "" {
@@ -235,7 +297,15 @@ func (h *AdminHandler) ListProjects(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"items": projects})
 }
 
-// CreateProject creates project.
+// CreateProject godoc
+// @Summary Create project
+// @Tags Admin
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param payload body dto.ProjectPayload true "Project payload"
+// @Success 201 {object} map[string]interface{}
+// @Router /admin/projects [post]
 func (h *AdminHandler) CreateProject(c *fiber.Ctx) error {
 	var payload dto.ProjectPayload
 	if err := c.BodyParser(&payload); err != nil {
@@ -252,7 +322,16 @@ func (h *AdminHandler) CreateProject(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"project": project})
 }
 
-// UpdateProject updates project.
+// UpdateProject godoc
+// @Summary Update project
+// @Tags Admin
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "Project ID"
+// @Param payload body dto.ProjectPayload true "Project payload"
+// @Success 200 {object} map[string]interface{}
+// @Router /admin/projects/{id} [put]
 func (h *AdminHandler) UpdateProject(c *fiber.Ctx) error {
 	id, err := uuid.Parse(c.Params("id"))
 	if err != nil {
@@ -274,7 +353,13 @@ func (h *AdminHandler) UpdateProject(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"project": project})
 }
 
-// DeleteProject deletes project.
+// DeleteProject godoc
+// @Summary Delete project
+// @Tags Admin
+// @Security BearerAuth
+// @Param id path string true "Project ID"
+// @Success 204
+// @Router /admin/projects/{id} [delete]
 func (h *AdminHandler) DeleteProject(c *fiber.Ctx) error {
 	id, err := uuid.Parse(c.Params("id"))
 	if err != nil {
@@ -287,7 +372,13 @@ func (h *AdminHandler) DeleteProject(c *fiber.Ctx) error {
 	return c.SendStatus(fiber.StatusNoContent)
 }
 
-// ListCategories returns expense categories.
+// ListCategories godoc
+// @Summary List categories
+// @Tags Admin
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} map[string]interface{}
+// @Router /admin/categories [get]
 func (h *AdminHandler) ListCategories(c *fiber.Ctx) error {
 	ctx := requestContext(c)
 	cats, err := h.references.ListCategories(ctx)
@@ -297,7 +388,15 @@ func (h *AdminHandler) ListCategories(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"items": cats})
 }
 
-// CreateCategory creates category.
+// CreateCategory godoc
+// @Summary Create category
+// @Tags Admin
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param payload body dto.ExpenseCategoryPayload true "Category payload"
+// @Success 201 {object} map[string]interface{}
+// @Router /admin/categories [post]
 func (h *AdminHandler) CreateCategory(c *fiber.Ctx) error {
 	var payload dto.ExpenseCategoryPayload
 	if err := c.BodyParser(&payload); err != nil {
@@ -315,7 +414,16 @@ func (h *AdminHandler) CreateCategory(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"category": category})
 }
 
-// UpdateCategory updates category.
+// UpdateCategory godoc
+// @Summary Update category
+// @Tags Admin
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "Category ID"
+// @Param payload body dto.ExpenseCategoryPayload true "Category payload"
+// @Success 200 {object} map[string]interface{}
+// @Router /admin/categories/{id} [put]
 func (h *AdminHandler) UpdateCategory(c *fiber.Ctx) error {
 	id, err := uuid.Parse(c.Params("id"))
 	if err != nil {
@@ -338,7 +446,13 @@ func (h *AdminHandler) UpdateCategory(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"category": category})
 }
 
-// DeleteCategory deletes category.
+// DeleteCategory godoc
+// @Summary Delete category
+// @Tags Admin
+// @Security BearerAuth
+// @Param id path string true "Category ID"
+// @Success 204
+// @Router /admin/categories/{id} [delete]
 func (h *AdminHandler) DeleteCategory(c *fiber.Ctx) error {
 	id, err := uuid.Parse(c.Params("id"))
 	if err != nil {
@@ -351,7 +465,15 @@ func (h *AdminHandler) DeleteCategory(c *fiber.Ctx) error {
 	return c.SendStatus(fiber.StatusNoContent)
 }
 
-// CreateBudget creates a budget entry.
+// CreateBudget godoc
+// @Summary Create budget
+// @Tags Admin
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param payload body dto.BudgetPayload true "Budget payload"
+// @Success 201 {object} map[string]interface{}
+// @Router /admin/budgets [post]
 func (h *AdminHandler) CreateBudget(c *fiber.Ctx) error {
 	var payload dto.BudgetPayload
 	if err := c.BodyParser(&payload); err != nil {
@@ -368,7 +490,15 @@ func (h *AdminHandler) CreateBudget(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"budget": budget})
 }
 
-// ListBudgets returns budgets optionally filtered.
+// ListBudgets godoc
+// @Summary List budgets
+// @Tags Admin
+// @Produce json
+// @Security BearerAuth
+// @Param scope_type query string false "department|project"
+// @Param scope_id query string false "Scope ID"
+// @Success 200 {object} map[string]interface{}
+// @Router /admin/budgets [get]
 func (h *AdminHandler) ListBudgets(c *fiber.Ctx) error {
 	var scopeType *models.BudgetScopeType
 	switch c.Query("scope_type") {

@@ -46,7 +46,14 @@ func NewExpenseReportHandler(
 	}
 }
 
-// Create creates report for trip.
+// Create godoc
+// @Summary Create expense report
+// @Tags ExpenseReports
+// @Produce json
+// @Security BearerAuth
+// @Param tripId path string true "Trip ID"
+// @Success 201 {object} map[string]interface{}
+// @Router /trip-requests/{tripId}/expense-report [post]
 func (h *ExpenseReportHandler) Create(c *fiber.Ctx) error {
 	user := middleware.GetUser(c)
 	if user == nil {
@@ -92,7 +99,14 @@ func (h *ExpenseReportHandler) Create(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"report": report})
 }
 
-// GetByTrip returns report for trip.
+// GetByTrip godoc
+// @Summary Get expense report for trip
+// @Tags ExpenseReports
+// @Produce json
+// @Security BearerAuth
+// @Param tripId path string true "Trip ID"
+// @Success 200 {object} map[string]interface{}
+// @Router /trip-requests/{tripId}/expense-report [get]
 func (h *ExpenseReportHandler) GetByTrip(c *fiber.Ctx) error {
 	user := middleware.GetUser(c)
 	if user == nil {
@@ -121,7 +135,14 @@ func (h *ExpenseReportHandler) GetByTrip(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"report": report, "items": items})
 }
 
-// Get returns report by id with items.
+// Get godoc
+// @Summary Get expense report by ID
+// @Tags ExpenseReports
+// @Produce json
+// @Security BearerAuth
+// @Param reportId path string true "Report ID"
+// @Success 200 {object} map[string]interface{}
+// @Router /expense-reports/{reportId} [get]
 func (h *ExpenseReportHandler) Get(c *fiber.Ctx) error {
 	user := middleware.GetUser(c)
 	if user == nil {
@@ -142,7 +163,16 @@ func (h *ExpenseReportHandler) Get(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"report": report, "items": items})
 }
 
-// AddItem adds expense item.
+// AddItem godoc
+// @Summary Add expense item
+// @Tags ExpenseReports
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param reportId path string true "Report ID"
+// @Param payload body dto.ExpenseItemPayload true "Expense item payload"
+// @Success 201 {object} map[string]interface{}
+// @Router /expense-reports/{reportId}/items [post]
 func (h *ExpenseReportHandler) AddItem(c *fiber.Ctx) error {
 	user := middleware.GetUser(c)
 	if user == nil {
@@ -177,7 +207,17 @@ func (h *ExpenseReportHandler) AddItem(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"item": item})
 }
 
-// UpdateItem updates existing item.
+// UpdateItem godoc
+// @Summary Update expense item
+// @Tags ExpenseReports
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param reportId path string true "Report ID"
+// @Param itemId path string true "Item ID"
+// @Param payload body dto.ExpenseItemPayload true "Expense item payload"
+// @Success 200 {object} map[string]interface{}
+// @Router /expense-reports/{reportId}/items/{itemId} [put]
 func (h *ExpenseReportHandler) UpdateItem(c *fiber.Ctx) error {
 	user := middleware.GetUser(c)
 	if user == nil {
@@ -227,7 +267,14 @@ func (h *ExpenseReportHandler) UpdateItem(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"item": updated})
 }
 
-// DeleteItem deletes expense item.
+// DeleteItem godoc
+// @Summary Delete expense item
+// @Tags ExpenseReports
+// @Security BearerAuth
+// @Param reportId path string true "Report ID"
+// @Param itemId path string true "Item ID"
+// @Success 204
+// @Router /expense-reports/{reportId}/items/{itemId} [delete]
 func (h *ExpenseReportHandler) DeleteItem(c *fiber.Ctx) error {
 	user := middleware.GetUser(c)
 	if user == nil {
@@ -264,7 +311,16 @@ func (h *ExpenseReportHandler) DeleteItem(c *fiber.Ctx) error {
 	return c.SendStatus(fiber.StatusNoContent)
 }
 
-// UpdateStatus handles report workflow.
+// UpdateStatus godoc
+// @Summary Change expense report status
+// @Tags ExpenseReports
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param reportId path string true "Report ID"
+// @Param payload body dto.ExpenseReportStatusPayload true "Status payload"
+// @Success 200 {object} map[string]interface{}
+// @Router /expense-reports/{reportId}/status [patch]
 func (h *ExpenseReportHandler) UpdateStatus(c *fiber.Ctx) error {
 	user := middleware.GetUser(c)
 	if user == nil {

@@ -38,7 +38,15 @@ func NewAuditHandler(
 	}
 }
 
-// ListApprovals returns workflow approvals for entity.
+// ListApprovals godoc
+// @Summary List approval actions
+// @Tags Audit
+// @Produce json
+// @Security BearerAuth
+// @Param entityType path string true "Entity type" Enums(trip_request,advance_request,expense_report)
+// @Param entityId path string true "Entity ID"
+// @Success 200 {object} map[string]interface{}
+// @Router /audit/{entityType}/{entityId}/approvals [get]
 func (h *AuditHandler) ListApprovals(c *fiber.Ctx) error {
 	user := middleware.GetUser(c)
 	if user == nil {
@@ -62,7 +70,15 @@ func (h *AuditHandler) ListApprovals(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"items": actions})
 }
 
-// ListAuditLogs returns audit log entries for entity.
+// ListAuditLogs godoc
+// @Summary List audit log entries
+// @Tags Audit
+// @Produce json
+// @Security BearerAuth
+// @Param entityType path string true "Entity type" Enums(trip_request,advance_request,expense_report)
+// @Param entityId path string true "Entity ID"
+// @Success 200 {object} map[string]interface{}
+// @Router /audit/{entityType}/{entityId}/logs [get]
 func (h *AuditHandler) ListAuditLogs(c *fiber.Ctx) error {
 	user := middleware.GetUser(c)
 	if user == nil {

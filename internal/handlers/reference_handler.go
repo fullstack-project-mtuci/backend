@@ -22,7 +22,13 @@ func NewReferenceHandler(departments *repositories.DepartmentRepository, referen
 	return &ReferenceHandler{departments: departments, references: references}
 }
 
-// ListDepartments returns all departments.
+// ListDepartments godoc
+// @Summary List departments
+// @Tags References
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} map[string]interface{}
+// @Router /references/departments [get]
 func (h *ReferenceHandler) ListDepartments(c *fiber.Ctx) error {
 	ctx := requestContext(c)
 	deps, err := h.departments.ListDepartments(ctx)
@@ -32,7 +38,14 @@ func (h *ReferenceHandler) ListDepartments(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"items": deps})
 }
 
-// ListProjects returns projects optionally filtered by department.
+// ListProjects godoc
+// @Summary List projects
+// @Tags References
+// @Produce json
+// @Security BearerAuth
+// @Param department_id query string false "Department ID"
+// @Success 200 {object} map[string]interface{}
+// @Router /references/projects [get]
 func (h *ReferenceHandler) ListProjects(c *fiber.Ctx) error {
 	ctx := requestContext(c)
 	user := middleware.GetUser(c)
@@ -64,7 +77,13 @@ func (h *ReferenceHandler) ListProjects(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"items": projects})
 }
 
-// ListCategories returns available expense categories.
+// ListCategories godoc
+// @Summary List expense categories
+// @Tags References
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} map[string]interface{}
+// @Router /references/categories [get]
 func (h *ReferenceHandler) ListCategories(c *fiber.Ctx) error {
 	ctx := requestContext(c)
 	cats, err := h.references.ListCategories(ctx)

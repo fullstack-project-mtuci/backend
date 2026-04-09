@@ -39,7 +39,16 @@ func NewTripHandler(trips *repositories.TripRepository, budgets *repositories.Bu
 	}
 }
 
-// Create handles POST /trip-requests.
+// Create godoc
+// @Summary Create trip request
+// @Tags Trips
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param payload body dto.TripPayload true "Trip data"
+// @Success 201 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Router /trip-requests [post]
 func (h *TripHandler) Create(c *fiber.Ctx) error {
 	user := middleware.GetUser(c)
 	if user == nil {
@@ -70,7 +79,13 @@ func (h *TripHandler) Create(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"trip": trip})
 }
 
-// List handles GET /trip-requests.
+// List godoc
+// @Summary List trip requests
+// @Tags Trips
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} map[string]interface{}
+// @Router /trip-requests [get]
 func (h *TripHandler) List(c *fiber.Ctx) error {
 	user := middleware.GetUser(c)
 	if user == nil {
@@ -94,7 +109,15 @@ func (h *TripHandler) List(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"items": trips})
 }
 
-// Get handles GET /trip-requests/:id.
+// Get godoc
+// @Summary Get trip by ID
+// @Tags Trips
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "Trip ID"
+// @Success 200 {object} map[string]interface{}
+// @Failure 404 {object} map[string]interface{}
+// @Router /trip-requests/{id} [get]
 func (h *TripHandler) Get(c *fiber.Ctx) error {
 	user := middleware.GetUser(c)
 	if user == nil {
@@ -113,7 +136,17 @@ func (h *TripHandler) Get(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"trip": trip})
 }
 
-// Update handles PUT /trip-requests/:id.
+// Update godoc
+// @Summary Update trip
+// @Tags Trips
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "Trip ID"
+// @Param payload body dto.TripPayload true "Trip data"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Router /trip-requests/{id} [put]
 func (h *TripHandler) Update(c *fiber.Ctx) error {
 	user := middleware.GetUser(c)
 	if user == nil {
@@ -161,7 +194,16 @@ func (h *TripHandler) Update(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"trip": updatedTrip})
 }
 
-// UpdateStatus handles PATCH /trip-requests/:id/status.
+// UpdateStatus godoc
+// @Summary Change trip status
+// @Tags Trips
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "Trip ID"
+// @Param payload body dto.StatusPayload true "Status payload"
+// @Success 200 {object} map[string]interface{}
+// @Router /trip-requests/{id}/status [patch]
 func (h *TripHandler) UpdateStatus(c *fiber.Ctx) error {
 	user := middleware.GetUser(c)
 	if user == nil {
@@ -246,7 +288,13 @@ func (h *TripHandler) UpdateStatus(c *fiber.Ctx) error {
 	return c.JSON(resp)
 }
 
-// Delete handles DELETE /trip-requests/:id.
+// Delete godoc
+// @Summary Delete trip
+// @Tags Trips
+// @Security BearerAuth
+// @Param id path string true "Trip ID"
+// @Success 204
+// @Router /trip-requests/{id} [delete]
 func (h *TripHandler) Delete(c *fiber.Ctx) error {
 	user := middleware.GetUser(c)
 	if user == nil {

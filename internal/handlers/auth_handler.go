@@ -30,7 +30,16 @@ func NewAuthHandler(users *repositories.UserRepository, tokenManager *tokens.Man
 	}
 }
 
-// Register creates a new employee account.
+// Register godoc
+// @Summary Register new employee
+// @Description Creates an employee profile and issues default role.
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param payload body dto.RegisterRequest true "Registration payload"
+// @Success 201 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Router /auth/register [post]
 func (h *AuthHandler) Register(c *fiber.Ctx) error {
 	var body dto.RegisterRequest
 	if err := c.BodyParser(&body); err != nil {
@@ -77,7 +86,15 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 	})
 }
 
-// Login authenticates user credentials and returns JWT tokens.
+// Login godoc
+// @Summary Login via email and password
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param payload body dto.LoginRequest true "Login payload"
+// @Success 200 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /auth/login [post]
 func (h *AuthHandler) Login(c *fiber.Ctx) error {
 	var body dto.LoginRequest
 	if err := c.BodyParser(&body); err != nil {
@@ -105,7 +122,15 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 	return h.respondWithTokens(c, user)
 }
 
-// Refresh issues a new access token based on a valid refresh token.
+// Refresh godoc
+// @Summary Refresh access token
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param payload body dto.RefreshTokenRequest true "Refresh token payload"
+// @Success 200 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /auth/refresh [post]
 func (h *AuthHandler) Refresh(c *fiber.Ctx) error {
 	var body dto.RefreshTokenRequest
 	if err := c.BodyParser(&body); err != nil {
@@ -147,7 +172,14 @@ func (h *AuthHandler) Refresh(c *fiber.Ctx) error {
 	return h.respondWithTokens(c, user)
 }
 
-// Me returns the authenticated user profile.
+// Me godoc
+// @Summary Get current user
+// @Tags Auth
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /auth/me [get]
 func (h *AuthHandler) Me(c *fiber.Ctx) error {
 	user := middleware.GetUser(c)
 	if user == nil {
